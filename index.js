@@ -6,6 +6,7 @@ const grantAccessContainer= document.querySelector(".grant-location-container");
 const searchForm = document.querySelector("[data-searchForm]")
 const loadingScreen = document.querySelector(".loading-container")
 const userInfoContainer = document.querySelector(".user-info-container")
+const errorContainer = document.querySelector(".error-container")
 
 //initially variables need??
 
@@ -23,15 +24,23 @@ function switchTab(newTab){
         if(!searchForm.classList.contains("active")){
             //if search form container is invisible make it visible
             userInfoContainer.classList.remove("active");
-            grantAccessContainer.classList.add("active");
+            grantAccessContainer.classList.remove("active");
             searchForm.classList.add("active");
+            loadingScreen.classList.remove("active");
+                errorContainer.classList.remove("active"); 
+
+
         }
         else{
             //main phle search wale tab pr tha,ab your weather tab visible krna h
             searchForm.classList.remove("active");
+            grantAccessContainer.classList.remove("active");
             userInfoContainer.classList.remove("active");
+            loadingScreen.classList.remove("active");
             //ab main your weather tab me aagya hu,toh weather bhi display krna pdega so let`s check local storage first
             //for coordinates if we have saved them there.
+            errorContainer.classList.remove("active"); 
+
             getfromSessionStorage();
         }
 
@@ -100,11 +109,11 @@ function renderWeatherInfo(weatherInfo){
     cityName.innerText=weatherInfo?.name;
     countryIcon.src=`https://flagcdn.com/144x108/${weatherInfo.sys?.country.toLowerCase()}.png`;
     desc.innerText=weatherInfo?.weather?.[0]?.description;
-    weatherIcon.src=`https://openweathermap.org/img/w/${weatherInfo?.weather?.[0]?.icon}.png`;
-    temp.innerText=weatherInfo?.main?.temp;
-    windspeed.innerText=weatherInfo?.wind?.speed;
-    humidity.innerText=weatherInfo?.main?.humidity;
-    cloudiness.innerText=weatherInfo?.clouds?.all;
+    weatherIcon.src=`https://openweathermap.org/img/wn/${weatherInfo.weather[0].icon}@2x.png`;
+    temp.innerText = weatherInfo?.main?.temp + "℃";
+    windspeed.innerText=weatherInfo?.wind?.speed + "m/s";
+    humidity.innerText=weatherInfo?.main?.humidity +"%";
+    cloudiness.innerText=weatherInfo?.clouds?.all +"%";
 
 }
 
@@ -142,6 +151,7 @@ searchForm.addEventListener("submit",(e)=>{
     }
     else{
         fetchSearchWeatherInfo(cityName);
+        searchInput.value = "";
     }
 })
 
@@ -149,13 +159,20 @@ async function fetchSearchWeatherInfo(city){
     loadingScreen.classList.add("active");
     userInfoContainer.classList.remove("active");
     grantAccessContainer.classList.remove("active");
+    errorContainer.classList.remove("active");
 
     try{
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${API_KEY}&units=metric`
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
         );
         const data=await response.json();
         loadingScreen.classList.remove("active");
+        if(data.cod!=200){
+            loadingScreen.classList.remove("active");
+            errorContainer.classList.add("active");
+            return;
+        }
+        errorContainer.classList.remove("active");
         userInfoContainer.classList.add("active");
         renderWeatherInfo(data);
 
