@@ -24,11 +24,6 @@ A responsive weather application that provides real-time weather information for
 
 <img width="1847" height="1087" alt="image" src="https://github.com/user-attachments/assets/87d2ee13-cb9f-4b6f-bcd8-8d64089e1542" />
 
-
-### Home Page
-
-![Weather App Screenshot](images/weather-app.png)
-
 ## 📂 Project Structure
 
 ```text
